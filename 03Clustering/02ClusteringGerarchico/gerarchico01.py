@@ -17,10 +17,12 @@ plt.scatter(X[:, 0], X[:, 1], s=70)
 plt.show()
 
 # costruisco una matrice di associazioni (linkage), usando il Ward's linkage
+# che è una versione "macchina" del dendrogramma
 link_matrix = linkage(X, method="ward")
 
 # visualizzo la matrice di linkage
-pd_lnk_mtx = pd.DataFrame(link_matrix, columns=["cluster ID_A", "cluaster ID_B", "distanza", "numero dati"])
+# imposto il nome delle colonne per chiarire i valori che contengono
+pd_lnk_mtx = pd.DataFrame(link_matrix, columns=["cluster ID_A", "cluster ID_B", "distanza", "numero dati"])
 print(pd_lnk_mtx)
 
 # visualizzo il dendrogramma
@@ -30,7 +32,7 @@ plt.show()
 # ora che ho idea della soglia da utilizzare, posso creare il modello di clustering agglomerativo
 # NOTA: in SciKitLearn è necessario indicare subito il numero di cluster, quindi si va a perdere
 # l'utilità del dendrogramma...
-agglom_clustering = AgglomerativeClustering(n_clusters=5)
+agglom_clustering = AgglomerativeClustering(n_clusters=5, linkage="ward")
 # in un unico passaggio addestro il modello ed elaboto la predizione
 y = agglom_clustering.fit_predict(X)
 
