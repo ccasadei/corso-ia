@@ -16,6 +16,7 @@ response.download(arguments)
 from keras.applications import MobileNetV2, mobilenet_v2
 from keras.layers import Dense
 from keras.models import Model
+from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import Adam
 
@@ -64,4 +65,48 @@ model.fit_generator(generator=train_generator,
                     epochs=10,
                     verbose=1)
 
+import urllib
+import numpy as np
 
+
+def download_image(url, filename):
+    # eseguo una GET sulla url passata come parametro
+    with urllib.request.urlopen(url) as url_get:
+        # apro il file su cui scriverò l'immagine
+        with open(filename, "wb") as f:
+            # leggo dalla GET e scrivo sul file
+            f.write(url_get.read())
+
+
+def load_image(img_path):
+    # carico l'immagine dal file
+    img = image.load_img(img_path, target_size=(224, 224))
+    # trasformo l'immagine in un array Numpy
+    # lo shape dell'array sono (altezza, larghezza, canali colore)
+    # quindi in questo caso (224, 224, 3)
+    img_array = image.img_to_array(img)
+    # aggiungo una dimensione all'inizio
+    # lo shape diventa (1, 224, 224, 3)
+    # dove "1" indica quante immagini sono presenti nel batch
+    img_array_batch = np.expand_dims(img_array, axis=0)
+    # normalizzo i valori da 0..255 a 0..1
+    img_array_batch /= 255.
+
+    return img_array_batch
+
+
+# verifico la predizione su un disegno di ciciarella (immagine non utilizzato in training)
+download_image("http://www.connemara.it/natura/fauna/uccelli/cinciarella%20foto/cinciarella%20disegno.jpg",
+               "tempcinciarella.jpg")
+
+img_di_test = load_image("tempcinciarella.jpg")
+predizione = model.predict(img_di_test)
+print("Predizione cinciarella:", predizione)
+
+# analogamente per una immagine di corvo
+download_image("http://3.bp.blogspot.com/-FV6e0kERgFE/VQMHK0m0E3I/AAAAAAAAFpA/7BeFPWSq8Tk/s1600/Nevermore.jpg",
+               "tempcorvo.jpg")
+
+img_di_test = load_image("tempcorvo.jpg")
+predizione = model.predict(img_di_test)
+print("Predizione corvo:", predizione)
