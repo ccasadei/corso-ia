@@ -1,0 +1,6 @@
+wget
+tensorflow
+numpy
+matplotlib
+opencv-python
+tqdm
